@@ -259,6 +259,12 @@ class CtaTemplate(ABC):
         if self.trading:
             self.cta_engine.cancel_order(self, vt_orderid)
 
+    def set_leverage(self, leverage: int) -> None:
+        self.cta_engine.set_leverage(self, leverage)
+
+    def set_margin_type(self, margin_type: str) -> None:
+        self.cta_engine.set_margin_type(self, margin_type)
+
     def cancel_all(self) -> None:
         """
         Cancel all orders sent by strategy.
@@ -271,6 +277,7 @@ class CtaTemplate(ABC):
         Write a log message.
         """
         self.cta_engine.write_log(msg, self)
+        self.cta_engine.push_message(msg, self)
 
     def get_engine_type(self) -> EngineType:
         """
