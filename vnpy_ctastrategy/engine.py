@@ -20,7 +20,10 @@ from vnpy.trader.object import (
     LogData,
     TickData,
     BarData,
-    ContractData
+    ContractData,
+    LeverageRequest,
+    PositionSideRequest,
+    MarginTypeRequest
 )
 from vnpy.trader.event import (
     EVENT_TICK,
@@ -470,6 +473,24 @@ class CtaEngine(BaseEngine):
         self.call_strategy_func(strategy, strategy.on_stop_order, stop_order)
         self.put_stop_order_event(stop_order)
 
+    def set_leverage(self, strategy: CtaTemplate, leverage: int):
+        contract = self.main_engine.get_contract(strategy.vt_symbol)
+        if not contract:
+            self.write_log(f"委托失败，找不到合约：{strategy.vt_symbol}", strategy)
+            return
+
+        req: LeverageRequest = LeverageRequest(symbol=contract.symbol, leverage=leverage, exchange=contract.exchange)
+        self.main_engine.set_leverage(req, contract.gateway_name)
+        
+    def set_margin_type(self, strategy: CtaTemplate, margin_type: str):
+        contract = self.main_engine.get_contract(strategy.vt_symbol)
+        if not contract:
+            self.write_log(f"委托失败，找不到合约：{strategy.vt_symbol}", strategy)
+            return
+
+        req: MarginTypeRequest = MarginTypeRequest(symbol=contract.symbol, margin_type=margin_type, exchange=contract.exchange)
+        self.main_engine.set_margin_type(req, contract.gateway_name)
+    
     def send_order(
         self,
         strategy: CtaTemplate,
@@ -800,9 +821,9 @@ class CtaEngine(BaseEngine):
         Load strategy class from certain folder.
         """
         for suffix in ["py", "pyd", "so"]:
-            pathname: str = str(path) + f"\\*.{suffix}"
-            for filepath in glob(pathname):
-                filename: str = Path(filepath).stem
+            ret = path.glob(f"*.{suffix}")
+            for filepath in ret:
+                filename: str = filepath.stem
                 name: str = f"{module_name}.{filename}"
                 self.load_strategy_class_from_module(name)
 
@@ -957,3 +978,9 @@ class CtaEngine(BaseEngine):
             subject = "CTA策略引擎"
 
         self.main_engine.send_email(subject, msg)
+
+    def push_message(self, msg: str, strategy: CtaTemplate = None):
+        """
+        Push message through feishu
+        """
+        self.main_engine.push_message(strategy.vt_symbol, msg)
