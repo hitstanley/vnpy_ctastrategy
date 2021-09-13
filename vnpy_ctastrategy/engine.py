@@ -224,10 +224,10 @@ class CtaEngine(BaseEngine):
             return
 
         # Update strategy pos before calling on_trade method
-        if trade.direction == Direction.LONG:
-            strategy.pos += trade.volume
-        else:
-            strategy.pos -= trade.volume
+        if trade.offset == Offset.OPEN:
+            strategy.pos = round(strategy.pos + trade.volume, 4)
+        elif trade.offset == Offset.CLOSE:
+            strategy.pos = round(strategy.pos - trade.volume, 4)
 
         self.call_strategy_func(strategy, strategy.on_trade, trade)
 
