@@ -1,5 +1,6 @@
 import importlib
 import traceback
+import time
 from collections import defaultdict
 from pathlib import Path
 from types import ModuleType
@@ -992,4 +993,9 @@ class CtaEngine(BaseEngine):
         """
         Push message through feishu
         """
-        self.main_engine.push_message(strategy.vt_symbol, msg)
+        if strategy:
+            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}]|{SETTINGS['account.name']}|{SETTINGS['feishu.keyword']}|{strategy.strategy_name}|\n{msg}"
+        else:
+            msg = f"[{time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}]|{SETTINGS['account.name']}|{SETTINGS['feishu.keyword']}|\n{msg}"
+
+        self.main_engine.push_message(msg)
