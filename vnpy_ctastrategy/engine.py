@@ -1,7 +1,7 @@
 import importlib
 import traceback
 import time
-from .setting import SETTINGS
+from vnpy.trader.setting import SETTINGS
 from collections import defaultdict
 from pathlib import Path
 from types import ModuleType
