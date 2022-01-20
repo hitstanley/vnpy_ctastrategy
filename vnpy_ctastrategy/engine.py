@@ -26,9 +26,6 @@ from vnpy.trader.object import (
     OrderData,
     TradeData,
     PositionData,
-    LeverageRequest,
-    PositionSideRequest,
-    MarginTypeRequest,
     ContractData,
     LeverageRequest,
     PositionSideRequest,
@@ -38,7 +35,8 @@ from vnpy.trader.event import (
     EVENT_TICK,
     EVENT_ORDER,
     EVENT_TRADE,
-    EVENT_POSITION
+    EVENT_POSITION,
+    EVENT_TIMER
 )
 from vnpy.trader.constant import (
     Direction,
@@ -137,6 +135,7 @@ class CtaEngine(BaseEngine):
         self.event_engine.register(EVENT_ORDER, self.process_order_event)
         self.event_engine.register(EVENT_TRADE, self.process_trade_event)
         self.event_engine.register(EVENT_POSITION, self.process_position_event)
+        self.event_engine.register(EVENT_TIMER, self.process_timer_event)
 
     def init_datafeed(self) -> None:
         """
@@ -161,6 +160,18 @@ class CtaEngine(BaseEngine):
         )
         data: List[BarData] = self.datafeed.query_bar_history(req)
         return data
+
+    def process_timer_event(self, event: Event):
+        """策略维度的定时事件"""
+        for strategy_class in self.classes.values():
+            if strategy_class.on_strategy_timer:
+                strategies = list()
+                for strategy in self.strategies.values():
+                    if not isinstance(strategy, strategy_class) or not strategy.inited:
+                        continue
+                    strategies.append(strategy)
+                if len(strategies) > 0:
+                    strategy_class.on_strategy_timer(strategies)
 
     def process_tick_event(self, event: Event) -> None:
         """"""
