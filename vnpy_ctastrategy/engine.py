@@ -158,7 +158,7 @@ class CtaEngine(BaseEngine):
     def process_timer_event(self, event: Event):
         """策略维度的定时事件"""
         for strategy_class in self.classes.values():
-            if strategy_class.on_strategy_timer:
+            if hasattr(strategy_class, 'on_strategy_timer'):
                 strategies = list()
                 for strategy in self.strategies.values():
                     if not isinstance(strategy, strategy_class) or not strategy.inited:
