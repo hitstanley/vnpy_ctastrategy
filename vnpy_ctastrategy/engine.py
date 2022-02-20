@@ -586,7 +586,7 @@ class CtaEngine(BaseEngine):
     def load_bar(
         self,
         vt_symbol: str,
-        days: int,
+        days: float,
         interval: Interval,
         callback: Callable[[BarData], None],
         use_database: bool
@@ -630,7 +630,7 @@ class CtaEngine(BaseEngine):
     def load_tick(
         self,
         vt_symbol: str,
-        days: int,
+        days: float,
         callback: Callable[[TickData], None]
     ) -> List[TickData]:
         """"""

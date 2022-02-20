@@ -293,7 +293,7 @@ class CtaTemplate(ABC):
 
     def load_bar(
         self,
-        days: int,
+        days: float,
         interval: Interval = Interval.MINUTE,
         callback: Callable = None,
         use_database: bool = False
@@ -315,7 +315,7 @@ class CtaTemplate(ABC):
         for bar in bars:
             callback(bar)
 
-    def load_tick(self, days: int) -> None:
+    def load_tick(self, days: float) -> None:
         """
         Load historical tick data for initializing strategy.
         """
