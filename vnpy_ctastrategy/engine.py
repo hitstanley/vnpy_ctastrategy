@@ -393,6 +393,32 @@ class CtaEngine(BaseEngine):
             net
         )
 
+    def send_market_order(
+        self,
+        strategy: CtaTemplate,
+        contract: ContractData,
+        direction: Direction,
+        offset: Offset,
+        price: float,
+        volume: float,
+        lock: bool,
+        net: bool
+    ):
+        """
+        Send a market order to server.
+        """
+        return self.send_server_order(
+            strategy,
+            contract,
+            direction,
+            offset,
+            price,
+            volume,
+            OrderType.MARKET,
+            lock,
+            net
+        )
+
     def send_server_stop_order(
         self,
         strategy: CtaTemplate,
@@ -503,7 +529,7 @@ class CtaEngine(BaseEngine):
 
         req: LeverageRequest = LeverageRequest(symbol=contract.symbol, leverage=leverage, exchange=contract.exchange)
         self.main_engine.set_leverage(req, contract.gateway_name)
-        
+
     def set_margin_type(self, strategy: CtaTemplate, margin_type: str):
         contract = self.main_engine.get_contract(strategy.vt_symbol)
         if not contract:
@@ -512,7 +538,7 @@ class CtaEngine(BaseEngine):
 
         req: MarginTypeRequest = MarginTypeRequest(symbol=contract.symbol, margin_type=margin_type, exchange=contract.exchange)
         self.main_engine.set_margin_type(req, contract.gateway_name)
-    
+
     def send_order(
         self,
         strategy: CtaTemplate,
@@ -522,7 +548,8 @@ class CtaEngine(BaseEngine):
         volume: float,
         stop: bool,
         lock: bool,
-        net: bool
+        net: bool,
+        market: bool
     ) -> list:
         """
         """
@@ -544,6 +571,10 @@ class CtaEngine(BaseEngine):
                 return self.send_local_stop_order(
                     strategy, direction, offset, price, volume, lock, net
                 )
+        elif market:
+            return self.send_market_order(
+                strategy, contract, direction, offset, price, volume, lock, net
+            )
         else:
             return self.send_limit_order(
                 strategy, contract, direction, offset, price, volume, lock, net
