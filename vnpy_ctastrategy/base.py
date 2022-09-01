@@ -53,6 +53,7 @@ INTERVAL_DELTA_MAP: Dict[Interval, timedelta] = {
     Interval.TICK: timedelta(milliseconds=1),
     Interval.MINUTE: timedelta(minutes=1),
     Interval.FIVE_MINUTE: timedelta(minutes=5),
+    Interval.FIFTEEN_MINUTE: timedelta(minutes=15),
     Interval.HOUR: timedelta(hours=1),
     Interval.DAILY: timedelta(days=1),
 }
